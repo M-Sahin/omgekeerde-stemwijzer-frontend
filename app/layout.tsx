@@ -3,14 +3,15 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
+import { AuthProvider } from "@/contexts/AuthContext"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "ChatAI - AI Chat Platform",
-  description: "The fastest and most powerful platform for AI chat",
+  title: "Omgekeerde Stemwijzer",
+  description: "Ontdek welke politieke partij het beste bij jouw standpunten past",
   generator: "v0.app",
 }
 
@@ -20,11 +21,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="nl">
       <body className={`font-sans antialiased`}>
-        {children}
-        <Toaster />
-        <Analytics />
+        <AuthProvider>
+          {children}
+          <Toaster />
+          <Analytics />
+        </AuthProvider>
       </body>
     </html>
   )

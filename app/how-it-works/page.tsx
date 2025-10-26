@@ -1,9 +1,14 @@
+"use client"
+
 import Link from "next/link"
 import { Brain, Database, CheckCircle, Zap, Globe, AlertCircle, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/AuthContext"
 import Image from "next/image"
 
 export default function HowItWorksPage() {
+  const { user, loading } = useAuth()
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -13,9 +18,19 @@ export default function HowItWorksPage() {
             <Image src="/logo.jpg" alt="De Omgekeerde Stemwijzer Logo" width={40} height={40} className="rounded-lg" />
             <span className="text-xl font-semibold">De Omgekeerde Stemwijzer</span>
           </Link>
-          <Link href="/login">
-            <Button className="bg-foreground text-background hover:bg-foreground/90">Begin met vragen</Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            {loading ? (
+              <div className="size-4 border-2 border-muted border-t-foreground rounded-full animate-spin" />
+            ) : user ? (
+              <Link href="/chat">
+                <Button className="bg-foreground text-background hover:bg-foreground/90">Naar Chat</Button>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button className="bg-foreground text-background hover:bg-foreground/90">Begin met vragen</Button>
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -219,12 +234,22 @@ export default function HowItWorksPage() {
       <section className="container mx-auto px-4 py-20">
         <div className="max-w-3xl mx-auto text-center space-y-6 p-12 rounded-2xl border-2 border-border bg-card">
           <h2 className="text-3xl md:text-4xl font-bold">Klaar om te beginnen?</h2>
-          <p className="text-xl text-muted-foreground">Maak een account en stel je eerste vraag over de verkiezingen</p>
-          <Link href="/login">
-            <Button size="lg" className="text-base px-8 h-12 bg-foreground text-background hover:bg-foreground/90">
-              Inloggen of Registreren →
-            </Button>
-          </Link>
+          <p className="text-xl text-muted-foreground">
+            {user ? "Ga naar de chat en stel je vraag over de verkiezingen" : "Maak een account en stel je eerste vraag over de verkiezingen"}
+          </p>
+          {user ? (
+            <Link href="/chat">
+              <Button size="lg" className="text-base px-8 h-12 bg-foreground text-background hover:bg-foreground/90">
+                Naar Chat →
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button size="lg" className="text-base px-8 h-12 bg-foreground text-background hover:bg-foreground/90">
+                Inloggen of Registreren →
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
 

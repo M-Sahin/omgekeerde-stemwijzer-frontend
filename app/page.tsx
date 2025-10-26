@@ -1,9 +1,14 @@
+"use client"
+
 import Link from "next/link"
 import { CheckCircle, Database, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/AuthContext"
 import Image from "next/image"
 
 export default function LandingPage() {
+  const { user, loading } = useAuth()
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -14,9 +19,17 @@ export default function LandingPage() {
             <span className="text-xl font-semibold">De Omgekeerde Stemwijzer</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button className="bg-foreground text-background hover:bg-foreground/90">Begin met vragen</Button>
-            </Link>
+            {loading ? (
+              <div className="size-4 border-2 border-muted border-t-foreground rounded-full animate-spin" />
+            ) : user ? (
+              <Link href="/chat">
+                <Button className="bg-foreground text-background hover:bg-foreground/90">Naar Chat</Button>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button className="bg-foreground text-background hover:bg-foreground/90">Begin met vragen</Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -32,11 +45,19 @@ export default function LandingPage() {
             feiten uit de verkiezingsprogramma's.
           </p>
           <div className="pt-6 flex items-center justify-center gap-4">
-            <Link href="/login">
-              <Button size="lg" className="text-base px-8 h-12 bg-foreground text-background hover:bg-foreground/90">
-                Begin met vragen →
-              </Button>
-            </Link>
+            {user ? (
+              <Link href="/chat">
+                <Button size="lg" className="text-base px-8 h-12 bg-foreground text-background hover:bg-foreground/90">
+                  Naar Chat →
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button size="lg" className="text-base px-8 h-12 bg-foreground text-background hover:bg-foreground/90">
+                  Begin met vragen →
+                </Button>
+              </Link>
+            )}
             <Link href="/how-it-works">
               <Button size="lg" variant="ghost" className="text-base px-8 h-12">
                 Hoe het werkt →
@@ -159,6 +180,6 @@ export default function LandingPage() {
           </p>
         </div>
       </footer>
-    </div>
+      </div>
   )
 }

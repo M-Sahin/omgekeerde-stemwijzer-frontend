@@ -1,37 +1,39 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatInput } from "@/components/chat-input"
-import { auth } from "@/lib/firebase"
-import { onAuthStateChanged } from "firebase/auth"
-import { sendChatMessage } from "@/lib/api"
+import { ProtectedRoute } from "@/components/ProtectedRoute"
+import { useAuth } from "@/contexts/AuthContext"
+import { sendChatMessage, testApiConnection, getChatHistory } from "@/lib/api"
 import type { ChatMessage } from "@/lib/api"
 
 export default function ChatPage() {
-  const router = useRouter()
+  const { user } = useAuth()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [chatId] = useState(() => `chat-${Date.now()}`)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    // Test API connection when component mounts and user is available
+    const testConnection = async () => {
       if (user) {
-        setIsAuthenticated(true)
-      } else {
-        router.push("/login")
+        const apiConnected = await testApiConnection()
+        console.log("[Chat] API connection test:", apiConnected ? "SUCCESS" : "FAILED")
+        
+        if (!apiConnected) {
+          console.warn("[Chat] API might not be available")
+        }
       }
-    })
-
-    return () => unsubscribe()
-  }, [router])
+    }
+    
+    testConnection()
+  }, [user])
 
   const handleSendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return
+    if (!content.trim() || isLoading || !user) return
 
     const userMessage: ChatMessage = {
       role: "user",
@@ -43,11 +45,6 @@ export default function ChatPage() {
     setIsLoading(true)
 
     try {
-      const user = auth.currentUser
-      if (!user) {
-        throw new Error("Niet ingelogd")
-      }
-
       // Get Firebase ID token for authentication
       const idToken = await user.getIdToken()
 
@@ -71,24 +68,15 @@ export default function ChatPage() {
     }
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="size-12 border-4 border-muted border-t-foreground rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">Laden...</p>
+  return (
+    <ProtectedRoute>
+      <div className="flex h-screen bg-background">
+        <ChatSidebar />
+        <div className="flex-1 flex flex-col">
+          <ChatMessages messages={messages} isLoading={isLoading} />
+          <ChatInput value={input} onChange={setInput} onSend={handleSendMessage} disabled={isLoading} />
         </div>
       </div>
-    )
-  }
-
-  return (
-    <div className="flex h-screen bg-background">
-      <ChatSidebar />
-      <div className="flex-1 flex flex-col">
-        <ChatMessages messages={messages} isLoading={isLoading} />
-        <ChatInput value={input} onChange={setInput} onSend={handleSendMessage} disabled={isLoading} />
-      </div>
-    </div>
+    </ProtectedRoute>
   )
 }

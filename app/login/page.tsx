@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { AuthGuard } from "@/components/AuthGuard"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 
@@ -17,6 +18,14 @@ let signInWithPopup: any
 let GoogleAuthProvider: any
 
 export default function LoginPage() {
+  return (
+    <AuthGuard redirectIfAuthenticated={true} redirectTo="/chat">
+      <LoginPageContent />
+    </AuthGuard>
+  )
+}
+
+function LoginPageContent() {
   const router = useRouter()
   const { toast } = useToast()
   const [email, setEmail] = useState("")

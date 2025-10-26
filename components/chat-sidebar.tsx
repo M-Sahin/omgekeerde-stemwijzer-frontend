@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { MessageSquare, Plus, MoreHorizontal, Trash2, Edit2, Menu, X, LogOut } from "lucide-react"
@@ -9,20 +9,139 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
-import { auth } from "@/lib/firebase"
 import { signOut } from "firebase/auth"
+import { auth } from "@/lib/firebase"
+import { useAuth } from "@/contexts/AuthContext"
+import { getChatHistory, type ChatSession } from "@/lib/api"
 
 interface Chat {
   id: string
   title: string
-  timestamp: string
+  timestamp: string  // This will be the formatted string for display
 }
 
 export function ChatSidebar() {
   const router = useRouter()
   const { toast } = useToast()
+  const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
-  const [chats] = useState<Chat[]>([])  // Empty array - no dummy data
+  const [chats, setChats] = useState<Chat[]>([])
+  const [isLoadingChats, setIsLoadingChats] = useState(false)
+
+  // Load chat history when component mounts and user is available
+  useEffect(() => {
+    if (user) {
+      loadChatHistory()
+    }
+  }, [user])
+
+  const loadChatHistory = async () => {
+    if (!user) return
+    
+    try {
+      setIsLoadingChats(true)
+      const idToken = await user.getIdToken()
+      const chatSessions = await getChatHistory(idToken)
+      
+      // Convert ChatSession[] to Chat[] for our component
+      const chatData: Chat[] = chatSessions.map((session, index) => {
+        console.log("[ChatSidebar] Processing session:", session)
+        const formattedTimestamp = formatTimestamp(session.lastUpdated)
+        console.log("[ChatSidebar] Formatted timestamp:", formattedTimestamp)
+        
+        return {
+          id: session.id,
+          title: session.title || `Chat ${index + 1}`,
+          timestamp: formattedTimestamp === "Onbekend" ? "Recent" : formattedTimestamp
+        }
+      })
+      
+      setChats(chatData)
+      console.log("[ChatSidebar] Loaded chat history:", chatData)
+    } catch (error) {
+      console.error("[ChatSidebar] Failed to load chat history:", error)
+      // Don't show error toast for now - it might be that user has no chats yet
+    } finally {
+      setIsLoadingChats(false)
+    }
+  }
+
+  const formatTimestamp = (timestamp: any): string => {
+    try {
+      console.log("[ChatSidebar] Raw timestamp received:", timestamp, "Type:", typeof timestamp)
+      
+      let date: Date
+      
+      if (!timestamp) {
+        return "Onbekend"
+      }
+      
+      // Handle Firestore Timestamp object
+      if (typeof timestamp === 'object' && timestamp !== null) {
+        if (timestamp._seconds !== undefined) {
+          // Firestore timestamp with _seconds property
+          date = new Date(timestamp._seconds * 1000)
+          console.log("[ChatSidebar] Parsed Firestore timestamp (_seconds):", date)
+        } else if (timestamp.seconds !== undefined) {
+          // Firestore timestamp with seconds property
+          date = new Date(timestamp.seconds * 1000)
+          console.log("[ChatSidebar] Parsed Firestore timestamp (seconds):", date)
+        } else if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+          // Firestore Timestamp with toDate method
+          date = timestamp.toDate()
+          console.log("[ChatSidebar] Parsed Firestore timestamp (toDate):", date)
+        } else {
+          // Try to parse as Date object
+          date = new Date(timestamp)
+          console.log("[ChatSidebar] Parsed as Date object:", date)
+        }
+      } else if (typeof timestamp === 'string') {
+        // String timestamp
+        date = new Date(timestamp)
+        console.log("[ChatSidebar] Parsed string timestamp:", date)
+      } else if (typeof timestamp === 'number') {
+        // Unix timestamp (seconds or milliseconds)
+        if (timestamp.toString().length <= 10) {
+          // Seconds
+          date = new Date(timestamp * 1000)
+        } else {
+          // Milliseconds
+          date = new Date(timestamp)
+        }
+        console.log("[ChatSidebar] Parsed numeric timestamp:", date)
+      } else {
+        console.warn("[ChatSidebar] Unknown timestamp format:", timestamp)
+        return "Onbekend"
+      }
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn("[ChatSidebar] Invalid date created from timestamp:", timestamp)
+        return "Onbekend"
+      }
+      
+      const now = new Date()
+      const diffInMs = now.getTime() - date.getTime()
+      const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
+      const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+      
+      if (diffInMinutes < 1) return "Zojuist"
+      if (diffInMinutes < 60) return `${diffInMinutes} min geleden`
+      if (diffInHours < 1) return "< 1 uur geleden"
+      if (diffInHours < 24) return `${diffInHours} uur geleden`
+      if (diffInDays === 1) return "Gisteren"
+      if (diffInDays < 7) return `${diffInDays} dagen geleden`
+      
+      return date.toLocaleDateString('nl-NL', {
+        day: 'numeric',
+        month: 'short'
+      })
+    } catch (error) {
+      console.error("[ChatSidebar] Error formatting timestamp:", error, "Original:", timestamp)
+      return "Onbekend"
+    }
+  }
 
   const handleLogout = async () => {
     try {
@@ -42,7 +161,7 @@ export function ChatSidebar() {
     }
   }
 
-  const user = auth.currentUser
+  // Use user from AuthContext instead of auth.currentUser
   const userEmail = user?.email || "gebruiker@voorbeeld.nl"
   const userInitials = userEmail
     .split("@")[0]
@@ -77,7 +196,12 @@ export function ChatSidebar() {
             <Image src="/logo.jpg" alt="De Omgekeerde Stemwijzer Logo" width={32} height={32} className="rounded-lg" />
             <span className="text-lg font-semibold">De Omgekeerde Stemwijzer</span>
           </Link>
-          <Button className="w-full justify-start gap-2 bg-foreground text-background hover:bg-foreground/90">
+          <Button 
+            className="w-full justify-start gap-2 bg-foreground text-background hover:bg-foreground/90"
+            onClick={() => {
+              window.location.reload()
+            }}
+          >
             <Plus className="size-4" />
             Nieuw gesprek
           </Button>
@@ -86,7 +210,11 @@ export function ChatSidebar() {
         {/* Chat history */}
         <div className="flex-1 overflow-y-auto p-2">
           <div className="space-y-1">
-            {chats.length === 0 ? (
+            {isLoadingChats ? (
+              <div className="p-4 text-center text-muted-foreground">
+                <p className="text-sm">Chats laden...</p>
+              </div>
+            ) : chats.length === 0 ? (
               <div className="p-4 text-center text-muted-foreground">
                 <p className="text-sm">Nog geen gesprekken</p>
                 <p className="text-xs">Start een nieuw gesprek hierboven</p>

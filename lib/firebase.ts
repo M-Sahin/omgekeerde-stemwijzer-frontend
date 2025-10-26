@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app"
-import { getAuth, type Auth } from "firebase/auth"
+import { getAuth, type Auth, setPersistence, browserLocalPersistence } from "firebase/auth"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,6 +26,14 @@ let auth: Auth
 try {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
   auth = getAuth(app)
+  
+  // Set persistence to keep user logged in across browser sessions
+  // This persists the user session until they explicitly log out
+  setPersistence(auth, browserLocalPersistence).catch((error) => {
+    console.warn("[Firebase] Could not set persistence:", error)
+  })
+  
+  console.log("[Firebase] Authentication initialized with local persistence")
 } catch (error) {
   console.error("[v0] Firebase initialization error:", error)
   throw new Error("Firebase kon niet worden geïnitialiseerd. Controleer je configuratie.")
