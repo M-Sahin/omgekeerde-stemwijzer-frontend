@@ -257,6 +257,18 @@ export function ChatSidebar() {
           </div>
         </div>
 
+        {/* Navigation Links */}
+        <div className="p-2 border-t border-border">
+          <div className="space-y-1">
+            <Link href="/how-it-works" className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+              Hoe het werkt
+            </Link>
+            <Link href="/about" className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+              Over de maker
+            </Link>
+          </div>
+        </div>
+
         {/* User section */}
         <div className="p-4 border-t border-border">
           <DropdownMenu>

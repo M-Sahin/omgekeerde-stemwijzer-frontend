@@ -63,6 +63,11 @@ export default function LandingPage() {
                 Hoe het werkt →
               </Button>
             </Link>
+            <Link href="/about">
+              <Button size="lg" variant="ghost" className="text-base px-8 h-12">
+                Over de maker →
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -174,7 +179,20 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-border mt-20">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 space-y-4">
+          <div className="flex justify-center gap-6 text-sm">
+            <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+              Hoe het werkt
+            </Link>
+            <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+              Over de maker
+            </Link>
+            {user && (
+              <Link href="/chat" className="text-muted-foreground hover:text-foreground transition-colors">
+                Chat
+              </Link>
+            )}
+          </div>
           <p className="text-center text-sm text-muted-foreground">
             © 2025 De Omgekeerde Stemwijzer. Objectieve informatie voor geïnformeerde kiezers.
           </p>

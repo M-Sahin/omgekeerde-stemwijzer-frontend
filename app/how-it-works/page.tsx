@@ -97,7 +97,13 @@ export default function HowItWorksPage() {
                 <div className="flex gap-3">
                   <CheckCircle className="size-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <p className="text-muted-foreground leading-relaxed">
-                    <strong>Geen hallucinaties:</strong> Alleen feiten uit verkiezingsprogramma's
+                    <strong>Geen hallucinaties:</strong> Alleen feiten uit verkiezingsprogramma's in vector database
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <CheckCircle className="size-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-muted-foreground leading-relaxed">
+                    <strong>Geen internet:</strong> Zoekt alleen in specifieke database met verkiezingsdata
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -151,8 +157,9 @@ export default function HowItWorksPage() {
                   <Database className="size-6 text-foreground" />
                 </div>
                 <p className="text-muted-foreground leading-relaxed text-lg">
-                  De AI doorzoekt alle 20+ verkiezingsprogramma's en haalt alleen de relevante passages op die jouw
-                  vraag beantwoorden. Dit gebeurt in milliseconden.
+                  De AI doorzoekt alle 20+ verkiezingsprogramma's die zijn opgeslagen in een vector database. 
+                  Er wordt <strong>niet</strong> op internet gekeken - alleen in deze specifieke database met verkiezingsinformatie. 
+                  Dit gebeurt in milliseconden.
                 </p>
               </div>
             </div>
@@ -192,6 +199,64 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* Limitations Section */}
+      <section className="container mx-auto px-4 py-16 bg-card/30">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Belangrijk: Alleen verkiezingsvragen</h2>
+          <div className="space-y-6 p-8 rounded-xl border-2 border-orange-500/20 bg-orange-500/5">
+            <div className="flex items-start gap-4">
+              <div className="size-12 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="size-6 text-orange-600" />
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-2xl font-semibold">De AI kent alleen verkiezingsprogramma's</h3>
+                <p className="text-muted-foreground leading-relaxed text-lg">
+                  Onze AI is <strong>100% getraind op verkiezingsprogramma's</strong> en zoekt alleen in deze vector database. 
+                  Dit betekent dat algemene vragen die niets met de verkiezingen te maken hebben niet goed beantwoord kunnen worden.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-6 mt-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-green-600 flex items-center gap-2">
+                      <CheckCircle className="size-5" />
+                      Deze vragen werken goed:
+                    </h4>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li>• "Wat vinden partijen over klimaatverandering?"</li>
+                      <li>• "Welke partij wil de zorg verbeteren?"</li>
+                      <li>• "Standpunten over belastingen?"</li>
+                      <li>• "Wat schrijven partijen over onderwijs?"</li>
+                      <li>• "Asielbeleid van verschillende partijen?"</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-red-600 flex items-center gap-2">
+                      <AlertCircle className="size-5" />
+                      Deze vragen werken niet:
+                    </h4>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li>• "Wat is de hoofdstad van Frankrijk?"</li>
+                      <li>• "Hoe maak je een taart?"</li>
+                      <li>• "Wanneer is de volgende voetbalwedstrijd?"</li>
+                      <li>• "Wat is het weer vandaag?"</li>
+                      <li>• "Help me met programmeren"</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-background/50 rounded-lg border border-orange-500/20">
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Tip:</strong> Richt je vragen op politieke onderwerpen, partijstandpunten, of beleidsvoorstellen. 
+                    De AI heeft toegang tot alle verkiezingsprogramma's van 2025 en kan deze perfect vergelijken en doorzoeken.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Key Benefits */}
       <section className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
@@ -201,9 +266,10 @@ export default function HowItWorksPage() {
               <div className="size-12 rounded-lg bg-foreground/10 flex items-center justify-center">
                 <CheckCircle className="size-6 text-foreground" />
               </div>
-              <h3 className="text-xl font-semibold">Betrouwbaar</h3>
+              <h3 className="text-xl font-semibold">100% Betrouwbaar</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Geen risico op verzonnen informatie. Elk antwoord is traceerbaar naar de bron.
+                Geen risico op verzonnen informatie. Alle antwoorden komen direct uit de vector database 
+                met verkiezingsprogramma's - geen internet, geen hallucinaties.
               </p>
             </div>
 
@@ -255,7 +321,18 @@ export default function HowItWorksPage() {
 
       {/* Footer */}
       <footer className="border-t border-border mt-20">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 space-y-4">
+          <div className="flex justify-center gap-6 text-sm">
+            <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+              Home
+            </Link>
+            <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+              Over de maker
+            </Link>
+            <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+              Hoe het werkt
+            </Link>
+          </div>
           <p className="text-center text-sm text-muted-foreground">
             © 2025 De Omgekeerde Stemwijzer. Objectieve informatie voor geïnformeerde kiezers.
           </p>
