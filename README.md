@@ -32,20 +32,6 @@ Ik geloof dat democratie pas werkt als kiezers toegang hebben tot objectieve, fe
 - ChromaDB (vector database)
 - Google Cloud Run (backend)
 
-## Architectuur
-
-```mermaid
-graph TD
-    A[Gebruiker] -->|Webbrowser| B[Next.js Frontend]
-    B -->|Firebase Auth| C[Firebase]
-    B -->|API calls| D[Backend API (Cloud Run)]
-    D -->|Document retrieval| E[ChromaDB Vector Database]
-    D -->|Data| F[Firestore Database]
-    C -->|User sessions| B
-    E -->|Feitelijke passages| D
-    F -->|Chatgeschiedenis| D
-```
-
 ## Contact
 
 Heb je feedback, ideeën of wil je samenwerken? Stuur me gerust een bericht via LinkedIn of GitHub!
