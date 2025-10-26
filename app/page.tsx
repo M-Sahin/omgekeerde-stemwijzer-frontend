@@ -177,6 +177,18 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Waarschuwing voor gebruikers */}
+      <section className="container mx-auto px-4 pt-4">
+        <div className="max-w-full md:max-w-4xl mx-auto mb-4">
+          <div className="bg-orange-100 border border-orange-300 text-orange-900 rounded-xl p-4 text-sm md:text-base text-center">
+            <strong>Let op:</strong> Deze app werkt alleen voor{" "}
+            <span className="font-semibold">politieke vragen</span> over de verkiezingen en partijprogramma's. Algemene
+            vragen of vragen zonder politieke context geven geen (goed) antwoord. Stel dus altijd een vraag over een
+            politiek onderwerp!
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border mt-20">
         <div className="container mx-auto px-4 py-8 space-y-4">
@@ -198,6 +210,6 @@ export default function LandingPage() {
           </p>
         </div>
       </footer>
-      </div>
+    </div>
   )
 }
