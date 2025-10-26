@@ -78,7 +78,7 @@ export default function LandingPage() {
           <h2 className="text-xl md:text-2xl font-semibold mb-4 text-center">Tweede Kamerverkiezingen 2025</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
-              <div className="text-2xl md:text-3xl font-bold text-foreground">26 november</div>
+              <div className="text-2xl md:text-3xl font-bold text-foreground">29 oktober</div>
               <div className="text-sm text-muted-foreground mt-1">Verkiezingsdatum</div>
             </div>
             <div>
